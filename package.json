@@ -1,0 +1,27 @@
+{
+  "name": "russellorganizationmanager",
+  "version": "1.0.0",
+  "description": "This is a nodejs application that ties into a sql database which is used to manage an organization.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathanrusselldev/russellOrganizationManager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nathanrusselldev/russellOrganizationManager/issues"
+  },
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "express": "^4.17.3",
+    "inquirer": "^8.2.0",
+    "mysql": "^2.18.1"
+  },
+  "homepage": "https://github.com/nathanrusselldev/russellOrganizationManager#readme"
+}
