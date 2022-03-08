@@ -7,6 +7,7 @@ const cTable = require('console.table')
 
 const mysql = require('mysql');
 const res = require('express/lib/response');
+const { header } = require('express/lib/response');
 const db = mysql.createConnection(
     {
       host: 'localhost',
@@ -27,25 +28,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 
-
-// db.query('SELECT title AS Title, salary AS Salary, department_name AS Department FROM employee_roles JOIN department on employee_roles.department_id = department.id;', (err, table) => {
-//     console.table(table)
-// }) 
-
-// db.query(`SELECT employee.id, CONCAT(employee.first_name," ",employee.last_name) AS Employee, employee_roles.title AS Title, employee_roles.salary AS Salary, CONCAT(e.first_name, " " ,e.last_name) AS Manager FROM employee INNER JOIN employee_roles on employee_roles.id = employee.role_id INNER JOIN department on department.id = employee_roles.department_id LEFT JOIN employee e on employee.manager_id = e.id;`, (err, table) => {
-//     console.table(table)
-// });
-
-
-// db.query('SELECT * FROM department', (err, table) => {
-//     console.table(table)
-// });
-
-// db.query('SELECT title, salary, department_name FROM employee_roles JOIN department on employee_roles.department_id = department.id', (err, table) => {
-//     console.table(table)
-// }) 
-
-
 const init = () => {
     console.log('\n', 'Welcome to your organizational management system.', '\n      **********************************\n')
     inquirer.prompt ([
@@ -57,8 +39,9 @@ const init = () => {
                 'View employee roles.',
                 'View all employees.',
                 'Add a department.',
+                'Add a role.',
                 'Add an employee.',
-                'Update Employee role.',
+                'Update employee role.',
                 'Exit Database.'
 
             ],
@@ -81,11 +64,16 @@ const init = () => {
                 case 'Add a department.':
                     departmentAdd();
                     break;
+                case 'Add a role.':
+                    roleAdd();
+                    break;
                 case 'Add an employee.':
                     employeeAdd();
                     break;
+                case 'Update employee role.':
+                    updateRole();
+                    break;
                 }
-        
             });
 };
 
@@ -161,16 +149,64 @@ const employeeAdd = () => {
                 last_name: userInput.eLastName,
                 role_id: userInput.eRole.value,
                 manager_id: userInput.eManager.value
+                
+
             })
+            console.log(userInput)
             init()
        })
 };
 
+const roleAdd = () => {
+    inquirer.prompt ([
+        {
+            type: 'input',
+            message: 'What is the name of the role?',
+            name: 'roleName'
+        },
+        {
+            type: 'input',
+            message: 'What is the salary?',
+            name: 'roleSalary'
+        },
+        {
+            type: 'list',
+            message: "Which Department does the role belong too?",
+            choices: getDepartments(),
+            name: 'roleDepartment'
+        }
+       ]) .then((userInput) => {
+            db.query('INSERT INTO employee_roles SET ?', {
+                title: userInput.roleName,
+                salary: userInput.roleSalary,
+                department_id: userInput.roleDepartment.value
+            })
+            init()
+        })
+};  
+
 const updateRole = () => {
-    
+    console.log('making it here?')
+    inquirer.prompt ([
+        {
+            type: 'input',
+            message: 'Enter the employee id you wish to update.',
+            name: 'roleName'
+        },
+        {
+            type: 'list',
+            message: 'Which role would you like to give them?',
+            choices: getRoles(),
+            name: 'updatedRole'
+        }
+       ]) .then((userInput) => {
+        db.query('UPDATE employee SET role_id = ? WHERE id = ?', {
+            id: userInput.roleName,
+            role_id: userInput.updatedRole.value
+            })
+            init()
+        })
 };
-
-
 
 init()
 
@@ -179,7 +215,7 @@ app.listen(PORT, () => {
   });
 
 
-
+// This group of functions prepares arrays of answers for our inquirer prompts. 
 const managerArray = []
 const getManagers = () => {
 
@@ -207,4 +243,18 @@ const getRoles = () => {
         }
     }) 
     return roleArray
+}
+
+const departmentArray = []
+const getDepartments = () => {
+    db.query('SELECT id, department_name FROM department', (err, data) =>   {
+     
+        data = JSON.parse(JSON.stringify(data))
+ 
+        for (let i = 0; i < data.length; i++){
+            departmentArray.push({name: data[i].department_name, value: data[i].id});
+        
+        }
+    }) 
+    return departmentArray
 }
