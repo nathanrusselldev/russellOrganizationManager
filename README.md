@@ -13,8 +13,10 @@
 # Description
 
 This is a nodejs application that ties into a sql database which is used to manage an organization. It contains options for viewing the different databases of departments, employee roles, and employees. Users can add items to each database as well as update employee roles. 
-  
 
+Below is a tutorial video that will walk you through each feature.
+
+https://www.youtube.com/watch?v=O9gr7r6RUBY
 
 # Installation Instructions
 
